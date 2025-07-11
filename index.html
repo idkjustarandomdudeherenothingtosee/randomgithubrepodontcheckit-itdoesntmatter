@@ -5,30 +5,15 @@
   <title>Your Key!</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body, html { margin: 0; padding: 0; height: 100%;
-      background: #121212; color: #f0f0f0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      display: flex; justify-content: center; align-items: center;
-    }
-    #container { background: #1f1f1f; padding: 30px 40px;
-      border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.7);
-      max-width: 380px; width: 90vw; text-align: center;
-    }
+    body, html { margin: 0; padding: 0; height: 100%; background: #121212; color: #f0f0f0; font-family: "Segoe UI", Tahoma, sans-serif; display: flex; justify-content: center; align-items: center; }
+    #container { background: #1f1f1f; padding: 30px 40px; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.7); max-width: 380px; width: 90vw; text-align: center; }
     h1 { margin-bottom: 20px; }
-    #keyInput { width: 100%; padding: 15px 20px; font-size: 1.1rem;
-      border-radius: 10px; border: none; background: #2a2a2a;
-      color: #ddd; user-select: all; font-family: monospace;
-      margin-bottom: 25px; box-shadow: inset 0 0 8px #000;
-    }
+    #keyInput { width: 100%; padding: 15px 20px; font-size: 1.1rem; border-radius: 10px; border: none; background: #2a2a2a; color: #ddd; user-select: all; font-family: monospace; margin-bottom: 25px; box-shadow: inset 0 0 8px #000; }
     #keyInput:focus { outline: 2px solid #ffc107; background: #3b3b3b; }
-    button { background: #ffc107; border: none; border-radius: 12px;
-      padding: 15px 30px; font-size: 1.1rem; font-weight: 600; color: #121212;
-      cursor: pointer; transition: 0.3s; box-shadow: 0 4px 8px rgba(255,193,7,0.4);
-    }
+    button { background: #ffc107; border: none; border-radius: 12px; padding: 15px 30px; font-size: 1.1rem; font-weight: 600; color: #121212; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 8px rgba(255,193,7,0.4); }
     button:hover { background: #ffca28; box-shadow: 0 6px 14px rgba(255,193,7,0.6); }
     button:active { background: #e6ac00; }
-    #message { margin-top: 20px; color: #4caf50; font-weight: 600;
-      opacity: 0; transition: 0.4s; }
+    #message { margin-top: 20px; color: #4caf50; font-weight: 600; opacity: 0; transition: 0.4s; }
     #message.visible { opacity: 1; }
   </style>
 </head>
@@ -42,7 +27,7 @@
 
   <script>
     const jsonUrl = 'https://idkjustarandomdudeherenothingtosee.github.io/randomgithubrepodontcheckit-itdoesntmatter/newkeys.json';
-    const passphrase = "HeYbR0sT0pSK1dD1ng0r1lld1dlley0u";
+    const passphrase = "YOUR_SECRET_XOR_PASSPHRASE";
 
     const keyInput = document.getElementById("keyInput");
     const copyBtn = document.getElementById("copyBtn");
