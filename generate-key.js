@@ -1,33 +1,25 @@
 const fs = require("fs");
 
 const filename = "newkeys.json";
-const passphrase = "YOUR_SECRET_XOR_PASSPHRASE";
 const now = Date.now();
-const dayMs = 24 * 60 * 60 * 1000;
+const oneDay = 24 * 60 * 60 * 1000;
 
 let data = {};
 if (fs.existsSync(filename)) {
   data = JSON.parse(fs.readFileSync(filename, "utf8"));
 }
 
-if (!data.encrypted || now - data.created_at > dayMs) {
-  // Make new random 15-char key
-  const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+// If no key yet, or older than 24 h, make a new one
+if (!data.encrypted || now - data.created_at > oneDay) {
+  // 1) Generate raw key
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let rawKey = "";
   for (let i = 0; i < 15; i++) {
-    rawKey += charset.charAt(Math.floor(Math.random() * charset.length));
+    rawKey += chars.charAt(Math.floor(Math.random() * chars.length));
   }
 
-  // XOR encrypt
-  let encrypted = "";
-  for (let i = 0; i < rawKey.length; i++) {
-    encrypted += String.fromCharCode(
-      rawKey.charCodeAt(i) ^ passphrase.charCodeAt(i % passphrase.length)
-    );
-  }
-
-  // Convert binary XOR result to base64 for safe storage
-  const encryptedBase64 = Buffer.from(encrypted, "binary").toString("base64");
+  // 2) Base64‑encode it for safe storage
+  const encryptedBase64 = Buffer.from(rawKey, "utf8").toString("base64");
 
   data = {
     encrypted: encryptedBase64,
@@ -35,8 +27,7 @@ if (!data.encrypted || now - data.created_at > dayMs) {
   };
 
   fs.writeFileSync(filename, JSON.stringify(data, null, 2));
-  console.log(`✅ New XOR-encrypted key generated and saved.`);
-  console.log(`Decrypted key was: ${rawKey}`);
+  console.log("✅ New key generated:", rawKey);
 } else {
-  console.log(`✅ Key still valid.`);
+  console.log("✅ Key still valid, no change.");
 }
