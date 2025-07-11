@@ -1,7 +1,7 @@
 const fs = require("fs");
 const crypto = require("crypto");
 
-const filename = "justarandomfiledontlookhereitdoesntmatterthatmuch.json";
+const filename = "newkeys.json";
 
 // ⚡ Your secret passphrase (hardcoded here)
 const secret = "SuperSecretPassphrase123!"; // << Change this!
