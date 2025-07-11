@@ -15,7 +15,7 @@ function xorObfuscate(input, key) {
     .join('');
 }
 
-const FILE = 'justarandomfiledontlookhereitdoesntmatterthatmuch.json';
+const FILE = 'newkeys.json';
 let json = {};
 
 if (fs.existsSync(FILE)) {
