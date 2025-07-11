@@ -3,7 +3,7 @@ name: Generate and push new key
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 * * * *'  # runs every hour, optional
+    - cron: '0 * * * *'
 
 jobs:
   generate:
@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
