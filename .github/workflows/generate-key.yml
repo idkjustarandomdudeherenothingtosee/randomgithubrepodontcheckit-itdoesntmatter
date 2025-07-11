@@ -3,7 +3,7 @@ name: Generate and push new key
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 * * * *' # optional
+    - cron: '0 * * * *'  # runs every hour, optional
 
 jobs:
   generate:
@@ -22,9 +22,12 @@ jobs:
         run: node generate-key.js
 
       - name: Commit and push changes
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
+          git remote set-url origin https://x-access-token:${PAT_TOKEN}@github.com/${{ github.repository }}.git
           git add .
           git commit -m "Add new obfuscated key [skip ci]" || echo "No changes to commit"
-          git push
+          git push origin HEAD:${{ github.ref_name }}
