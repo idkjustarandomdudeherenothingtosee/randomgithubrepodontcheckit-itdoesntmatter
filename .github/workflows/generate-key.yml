@@ -1,9 +1,9 @@
 name: Generate and push new key
 
 on:
-  workflow_dispatch: # so you can run it manually
+  workflow_dispatch:
   schedule:
-    - cron: '0 * * * *' # optional: runs every hour
+    - cron: '0 * * * *' # optional
 
 jobs:
   generate:
@@ -17,9 +17,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Install dependencies
-        run: npm install
 
       - name: Run key generator script
         run: node generate-key.js
