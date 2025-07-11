@@ -1,17 +1,17 @@
 const fs = require("fs");
 
 const filename = "newkeys.json";
-const passphrase = "HeYbR0sT0pSK1dD1ng0r1lld1dlley0u";
+const passphrase = "YOUR_SECRET_XOR_PASSPHRASE";
 const now = Date.now();
 const dayMs = 24 * 60 * 60 * 1000;
 
 let data = {};
 if (fs.existsSync(filename)) {
-  data = JSON.parse(fs.readFileSync(filename));
+  data = JSON.parse(fs.readFileSync(filename, "utf8"));
 }
 
 if (!data.encrypted || now - data.created_at > dayMs) {
-  // Generate new key
+  // Make new random 15-char key
   const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let rawKey = "";
   for (let i = 0; i < 15; i++) {
@@ -26,7 +26,8 @@ if (!data.encrypted || now - data.created_at > dayMs) {
     );
   }
 
-  const encryptedBase64 = Buffer.from(encrypted).toString("base64");
+  // Convert binary XOR result to base64 for safe storage
+  const encryptedBase64 = Buffer.from(encrypted, "binary").toString("base64");
 
   data = {
     encrypted: encryptedBase64,
@@ -34,7 +35,8 @@ if (!data.encrypted || now - data.created_at > dayMs) {
   };
 
   fs.writeFileSync(filename, JSON.stringify(data, null, 2));
-  console.log(`✅ New XOR encrypted key: ${rawKey}`);
+  console.log(`✅ New XOR-encrypted key generated and saved.`);
+  console.log(`Decrypted key was: ${rawKey}`);
 } else {
   console.log(`✅ Key still valid.`);
 }
