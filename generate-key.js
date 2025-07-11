@@ -4,7 +4,7 @@ const crypto = require("crypto");
 const filename = "newkeys.json";
 
 // ⚡ Your secret passphrase (hardcoded here)
-const secret = "SuperSecretPassphrase123!"; // << Change this!
+const secret = "HeYbR0sT0pSK1dD1ng0r1lld1dlley0u"; // << Change this!
 
 // AES settings
 const algorithm = "aes-256-cbc";
