@@ -3,17 +3,14 @@ const crypto = require("crypto");
 
 const filename = "newkeys.json";
 
-// ⚡ Your secret passphrase (hardcoded here)
+// ⚡ Your secret passphrase (must match client-side)
 const secret = "HeYbR0sT0pSK1dD1ng0r1lld1dlley0u"; // << Change this!
 
 // AES settings
 const algorithm = "aes-256-cbc";
 
-// Make random 32-byte key from passphrase
+// Make 32-byte key from passphrase
 const key = crypto.createHash("sha256").update(secret).digest();
-
-// Random 16-byte IV for AES-CBC
-const iv = crypto.randomBytes(16);
 
 const now = Date.now();
 const dayMs = 24 * 60 * 60 * 1000;
@@ -24,14 +21,17 @@ if (fs.existsSync(filename)) {
 }
 
 if (!data.encrypted || now - data.created_at > dayMs) {
-  // Make new raw key
+  // Make new raw key (15 chars alphanumeric)
   const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let rawKey = "";
   for (let i = 0; i < 15; i++) {
     rawKey += charset.charAt(Math.floor(Math.random() * charset.length));
   }
 
-  // Encrypt
+  // Generate new random IV every encryption
+  const iv = crypto.randomBytes(16);
+
+  // Encrypt the key
   const cipher = crypto.createCipheriv(algorithm, key, iv);
   let encrypted = cipher.update(rawKey, "utf8", "base64");
   encrypted += cipher.final("base64");
