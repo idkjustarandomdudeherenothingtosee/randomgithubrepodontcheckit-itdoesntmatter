@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Your Key!</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.js"></script>
   <style>
-    /* Reset & basics */
     * {
       box-sizing: border-box;
     }
@@ -72,7 +71,6 @@
     button:active {
       background-color: #e6ac00;
     }
-
     #message {
       margin-top: 20px;
       color: #4caf50;
@@ -84,8 +82,6 @@
     #message.visible {
       opacity: 1;
     }
-
-    /* Responsive */
     @media (max-width: 400px) {
       #container {
         padding: 25px 20px;
@@ -109,9 +105,10 @@
   </div>
 
   <script>
-    const jsonUrl = 'https://raw.githubusercontent.com/idkjustarandomdudeherenothingtosee/randomgithubrepodontcheckit-itdoesntmatter/refs/heads/main/newkeys.json';
+    // ✅ Use your GitHub Pages URL — NOT raw.githubusercontent.com
+    const jsonUrl = 'https://idkjustarandomdudeherenothingtosee.github.io/randomgithubrepodontcheckit-itdoesntmatter/newkeys.json';
 
-    const secret = "HeYbR0sT0pSK1dD1ng0r1lld1dlley0u"; // Must match your encryption passphrase
+    const secret = "HeYbR0sT0pSK1dD1ng0r1lld1dlley0u"; // Must match your encrypt script
 
     const keyInput = document.getElementById("keyInput");
     const copyBtn = document.getElementById("copyBtn");
@@ -151,7 +148,6 @@
           return;
         }
 
-        // Decrypt with CryptoJS AES-CBC
         const key = CryptoJS.SHA256(secret);
         const iv = CryptoJS.enc.Base64.parse(ivBase64);
         const decrypted = CryptoJS.AES.decrypt(encrypted, key, {
