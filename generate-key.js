@@ -3,15 +3,12 @@ const crypto = require("crypto");
 
 const filename = "newkeys.json";
 
-// ⚡ Your secret passphrase (must match client-side)
-const secret = "HeYbR0sT0pSK1dD1ng0r1lld1dlley0u"; // << Change this!
+// ⚡ Secret passphrase
+const secret = "HeYbR0sT0pSK1dD1ng0r1lld1dlley0u";
 
-// AES settings
+// AES config
 const algorithm = "aes-256-cbc";
-
-// Make 32-byte key from passphrase
 const key = crypto.createHash("sha256").update(secret).digest();
-
 const now = Date.now();
 const dayMs = 24 * 60 * 60 * 1000;
 
@@ -21,17 +18,14 @@ if (fs.existsSync(filename)) {
 }
 
 if (!data.encrypted || now - data.created_at > dayMs) {
-  // Make new raw key (15 chars alphanumeric)
   const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let rawKey = "";
   for (let i = 0; i < 15; i++) {
     rawKey += charset.charAt(Math.floor(Math.random() * charset.length));
   }
 
-  // Generate new random IV every encryption
   const iv = crypto.randomBytes(16);
 
-  // Encrypt the key
   const cipher = crypto.createCipheriv(algorithm, key, iv);
   let encrypted = cipher.update(rawKey, "utf8", "base64");
   encrypted += cipher.final("base64");
@@ -43,7 +37,7 @@ if (!data.encrypted || now - data.created_at > dayMs) {
   };
 
   fs.writeFileSync(filename, JSON.stringify(data, null, 2));
-  console.log(`✅ New key generated and encrypted.`);
+  console.log(`✅ New key generated and encrypted: ${rawKey}`);
 } else {
   console.log(`✅ Key still valid.`);
 }
