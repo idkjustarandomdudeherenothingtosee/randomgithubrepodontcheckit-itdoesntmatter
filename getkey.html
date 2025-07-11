@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Your Access Key</title>
+  <title>Your Secure Key</title>
+  <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.js"></script>
 </head>
 <body>
   <h1>Your Key</h1>
@@ -12,19 +13,33 @@
   <script>
     const jsonUrl = 'https://<USERNAME>.github.io/<REPO>/justarandomfiledontlookhereitdoesntmatterthatmuch.json';
 
+    const secret = "SuperSecretPassphrase123!"; // << SAME as in Node
+
     fetch(jsonUrl)
       .then(res => res.json())
       .then(data => {
-        const key = atob(data.key); // deobfuscate base64
+        const encrypted = data.encrypted;
+        const ivBase64 = data.iv;
         const created = new Date(data.created_at);
         const now = new Date();
         const ageHours = (now - created) / (1000 * 60 * 60);
 
-        if (ageHours < 24) {
-          document.getElementById("key").innerText = key;
-        } else {
-          document.getElementById("key").innerText = "Key expired — please refresh the page!";
+        if (ageHours > 24) {
+          document.getElementById("key").innerText = "Key expired. Please refresh.";
+          return;
         }
+
+        // Decrypt
+        const key = CryptoJS.SHA256(secret);
+        const iv = CryptoJS.enc.Base64.parse(ivBase64);
+        const decrypted = CryptoJS.AES.decrypt(encrypted, key, {
+          iv: iv,
+          mode: CryptoJS.mode.CBC,
+          padding: CryptoJS.pad.Pkcs7
+        });
+
+        const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
+        document.getElementById("key").innerText = plaintext;
       })
       .catch(err => {
         document.getElementById("key").innerText = "Error loading key.";
