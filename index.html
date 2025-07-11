@@ -1,19 +1,139 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
   <meta charset="UTF-8" />
-  <title>Your Secure Key</title>
+  <title>Your Key!</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.js"></script>
+  <style>
+    /* Reset & basics */
+    * {
+      box-sizing: border-box;
+    }
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      background-color: #121212;
+      color: #f0f0f0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+    }
+    #container {
+      background: #1f1f1f;
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.7);
+      max-width: 380px;
+      width: 90vw;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+    }
+    #keyInput {
+      width: 100%;
+      padding: 15px 20px;
+      font-size: 1.1rem;
+      border-radius: 10px;
+      border: none;
+      background-color: #2a2a2a;
+      color: #ddd;
+      user-select: all;
+      resize: none;
+      font-family: monospace;
+      margin-bottom: 25px;
+      box-shadow: inset 0 0 8px #000;
+    }
+    #keyInput:focus {
+      outline: 2px solid #ffc107;
+      background-color: #3b3b3b;
+    }
+    button {
+      background-color: #ffc107;
+      border: none;
+      border-radius: 12px;
+      padding: 15px 30px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #121212;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 4px 8px rgba(255, 193, 7, 0.4);
+      user-select: none;
+    }
+    button:hover {
+      background-color: #ffca28;
+      box-shadow: 0 6px 14px rgba(255, 193, 7, 0.6);
+    }
+    button:active {
+      background-color: #e6ac00;
+    }
+
+    #message {
+      margin-top: 20px;
+      color: #4caf50;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      user-select: none;
+    }
+    #message.visible {
+      opacity: 1;
+    }
+
+    /* Responsive */
+    @media (max-width: 400px) {
+      #container {
+        padding: 25px 20px;
+      }
+      #keyInput {
+        font-size: 1rem;
+      }
+      button {
+        padding: 12px 25px;
+        font-size: 1rem;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h1>Your Key</h1>
-  <p id="key">Loading...</p>
-  <p>Copy this key and paste it in your Roblox script.</p>
+  <div id="container">
+    <h1>Your Key!</h1>
+    <textarea id="keyInput" rows="2" readonly placeholder="Loading key..."></textarea>
+    <button id="copyBtn" disabled>Copy Key</button>
+    <div id="message">Copied to clipboard!</div>
+  </div>
 
   <script>
     const jsonUrl = 'https://raw.githubusercontent.com/idkjustarandomdudeherenothingtosee/randomgithubrepodontcheckit-itdoesntmatter/refs/heads/main/newkeys.json';
 
-    const secret = "SuperSecretPassphrase123!"; // << SAME as in Node
+    const secret = "HeYbR0sT0pSK1dD1ng0r1lld1dlley0u"; // Must match your encryption passphrase
+
+    const keyInput = document.getElementById("keyInput");
+    const copyBtn = document.getElementById("copyBtn");
+    const message = document.getElementById("message");
+
+    function showMessage(text) {
+      message.textContent = text;
+      message.classList.add("visible");
+      setTimeout(() => {
+        message.classList.remove("visible");
+      }, 1800);
+    }
+
+    copyBtn.addEventListener("click", () => {
+      keyInput.select();
+      keyInput.setSelectionRange(0, 99999); // For mobile
+      navigator.clipboard.writeText(keyInput.value).then(() => {
+        showMessage("Copied to clipboard!");
+      }).catch(() => {
+        showMessage("Failed to copy :(");
+      });
+    });
 
     fetch(jsonUrl)
       .then(res => res.json())
@@ -25,11 +145,13 @@
         const ageHours = (now - created) / (1000 * 60 * 60);
 
         if (ageHours > 24) {
-          document.getElementById("key").innerText = "Key expired. Please refresh.";
+          keyInput.value = "";
+          keyInput.placeholder = "Key expired. Please refresh.";
+          copyBtn.disabled = true;
           return;
         }
 
-        // Decrypt
+        // Decrypt with CryptoJS AES-CBC
         const key = CryptoJS.SHA256(secret);
         const iv = CryptoJS.enc.Base64.parse(ivBase64);
         const decrypted = CryptoJS.AES.decrypt(encrypted, key, {
@@ -39,11 +161,22 @@
         });
 
         const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
-        document.getElementById("key").innerText = plaintext;
+
+        if (!plaintext) {
+          keyInput.value = "";
+          keyInput.placeholder = "Error decrypting key.";
+          copyBtn.disabled = true;
+          return;
+        }
+
+        keyInput.value = plaintext;
+        copyBtn.disabled = false;
       })
       .catch(err => {
-        document.getElementById("key").innerText = "Error loading key.";
         console.error(err);
+        keyInput.value = "";
+        keyInput.placeholder = "Error loading key.";
+        copyBtn.disabled = true;
       });
   </script>
 </body>
