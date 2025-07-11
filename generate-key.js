@@ -1,14 +1,7 @@
 const fs = require("fs");
-const crypto = require("crypto");
 
 const filename = "newkeys.json";
-
-// ⚡ Secret passphrase
-const secret = "HeYbR0sT0pSK1dD1ng0r1lld1dlley0u";
-
-// AES config
-const algorithm = "aes-256-cbc";
-const key = crypto.createHash("sha256").update(secret).digest();
+const passphrase = "HeYbR0sT0pSK1dD1ng0r1lld1dlley0u";
 const now = Date.now();
 const dayMs = 24 * 60 * 60 * 1000;
 
@@ -18,26 +11,30 @@ if (fs.existsSync(filename)) {
 }
 
 if (!data.encrypted || now - data.created_at > dayMs) {
+  // Generate new key
   const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let rawKey = "";
   for (let i = 0; i < 15; i++) {
     rawKey += charset.charAt(Math.floor(Math.random() * charset.length));
   }
 
-  const iv = crypto.randomBytes(16);
+  // XOR encrypt
+  let encrypted = "";
+  for (let i = 0; i < rawKey.length; i++) {
+    encrypted += String.fromCharCode(
+      rawKey.charCodeAt(i) ^ passphrase.charCodeAt(i % passphrase.length)
+    );
+  }
 
-  const cipher = crypto.createCipheriv(algorithm, key, iv);
-  let encrypted = cipher.update(rawKey, "utf8", "base64");
-  encrypted += cipher.final("base64");
+  const encryptedBase64 = Buffer.from(encrypted).toString("base64");
 
   data = {
-    encrypted: encrypted,
-    iv: iv.toString("base64"),
+    encrypted: encryptedBase64,
     created_at: now
   };
 
   fs.writeFileSync(filename, JSON.stringify(data, null, 2));
-  console.log(`✅ New key generated and encrypted: ${rawKey}`);
+  console.log(`✅ New XOR encrypted key: ${rawKey}`);
 } else {
   console.log(`✅ Key still valid.`);
 }
