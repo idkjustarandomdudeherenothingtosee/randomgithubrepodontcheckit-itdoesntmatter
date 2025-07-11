@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Your Access Key</title>
+</head>
+<body>
+  <h1>Your Key</h1>
+  <p id="key">Loading...</p>
+  <p>Copy this key and paste it in your Roblox script.</p>
+
+  <script>
+    const jsonUrl = 'https://<USERNAME>.github.io/<REPO>/justarandomfiledontlookhereitdoesntmatterthatmuch.json';
+
+    fetch(jsonUrl)
+      .then(res => res.json())
+      .then(data => {
+        const key = atob(data.key); // deobfuscate base64
+        const created = new Date(data.created_at);
+        const now = new Date();
+        const ageHours = (now - created) / (1000 * 60 * 60);
+
+        if (ageHours < 24) {
+          document.getElementById("key").innerText = key;
+        } else {
+          document.getElementById("key").innerText = "Key expired — please refresh the page!";
+        }
+      })
+      .catch(err => {
+        document.getElementById("key").innerText = "Error loading key.";
+        console.error(err);
+      });
+  </script>
+</body>
+</html>
