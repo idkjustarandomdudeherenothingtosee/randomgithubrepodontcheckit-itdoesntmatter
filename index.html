@@ -2,79 +2,58 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Your Key!</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Your Access Key</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    body, html { margin: 0; padding: 0; height: 100%; background: #121212; color: #f0f0f0; font-family: "Segoe UI", Tahoma, sans-serif; display: flex; justify-content: center; align-items: center; }
-    #container { background: #1f1f1f; padding: 30px 40px; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.7); max-width: 380px; width: 90vw; text-align: center; }
-    h1 { margin-bottom: 20px; }
-    #keyInput { width: 100%; padding: 15px 20px; font-size: 1.1rem; border-radius: 10px; border: none; background: #2a2a2a; color: #ddd; user-select: all; font-family: monospace; margin-bottom: 25px; box-shadow: inset 0 0 8px #000; }
-    #keyInput:focus { outline: 2px solid #ffc107; background: #3b3b3b; }
-    button { background: #ffc107; border: none; border-radius: 12px; padding: 15px 30px; font-size: 1.1rem; font-weight: 600; color: #121212; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 8px rgba(255,193,7,0.4); }
-    button:hover { background: #ffca28; box-shadow: 0 6px 14px rgba(255,193,7,0.6); }
-    button:active { background: #e6ac00; }
-    #message { margin-top: 20px; color: #4caf50; font-weight: 600; opacity: 0; transition: 0.4s; }
-    #message.visible { opacity: 1; }
+    body,html { margin:0; padding:0; height:100%; display:flex; align-items:center; justify-content:center; background:#121212; color:#eee; font-family:sans-serif; }
+    #box { background:#1f1f1f; padding:2rem; border-radius:12px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.6); max-width:360px; width:90%; }
+    h1 { margin-bottom:1rem; font-size:1.5rem; }
+    textarea { width:100%; padding:0.75rem; font-size:1rem; border:none; border-radius:8px; background:#2a2a2a; color:#fff; resize:none; font-family:monospace; box-shadow:inset 0 0 6px #000; }
+    button { margin-top:1rem; padding:0.75rem 1.5rem; font-size:1rem; border:none; border-radius:8px; background:#ffc107; color:#121212; cursor:pointer; transition:0.2s; }
+    button:disabled { background:#555; cursor:not-allowed; }
+    button:not(:disabled):hover { background:#ffca28; }
+    #msg { margin-top:0.5rem; color:#4caf50; opacity:0; transition:0.4s; }
+    #msg.visible { opacity:1; }
   </style>
 </head>
 <body>
-  <div id="container">
-    <h1>Your Key!</h1>
-    <textarea id="keyInput" rows="2" readonly placeholder="Loading key..."></textarea>
+  <div id="box">
+    <h1>Your Access Key</h1>
+    <textarea id="keyBox" rows="2" readonly placeholder="Loading…"></textarea>
     <button id="copyBtn" disabled>Copy Key</button>
-    <div id="message">Copied to clipboard!</div>
+    <div id="msg">Copied!</div>
   </div>
 
   <script>
-    const jsonUrl = 'https://idkjustarandomdudeherenothingtosee.github.io/randomgithubrepodontcheckit-itdoesntmatter/newkeys.json';
-    const passphrase = "YOUR_SECRET_XOR_PASSPHRASE";
+    const url = "https://<USERNAME>.github.io/<REPO>/newkeys.json"; // ← your Pages URL
+    const keyBox = document.getElementById("keyBox");
+    const btn = document.getElementById("copyBtn");
+    const msg = document.getElementById("msg");
 
-    const keyInput = document.getElementById("keyInput");
-    const copyBtn = document.getElementById("copyBtn");
-    const message = document.getElementById("message");
-
-    function showMessage(text) {
-      message.textContent = text;
-      message.classList.add("visible");
-      setTimeout(() => message.classList.remove("visible"), 1800);
-    }
-
-    copyBtn.addEventListener("click", () => {
-      keyInput.select();
-      navigator.clipboard.writeText(keyInput.value).then(() => {
-        showMessage("Copied to clipboard!");
-      }).catch(() => showMessage("Failed to copy :("));
+    btn.addEventListener("click", ()=> {
+      keyBox.select();
+      navigator.clipboard.writeText(keyBox.value).then(()=>{
+        msg.classList.add("visible");
+        setTimeout(()=>msg.classList.remove("visible"),1500);
+      });
     });
 
-    fetch(jsonUrl)
-      .then(res => res.json())
+    fetch(url)
+      .then(r => r.json())
       .then(data => {
-        const encryptedBase64 = data.encrypted;
-        const created = new Date(data.created_at);
-        const now = new Date();
-        const ageHours = (now - created) / (1000 * 60 * 60);
-
-        if (ageHours > 24) {
-          keyInput.placeholder = "Key expired. Please refresh.";
-          copyBtn.disabled = true;
+        const age = (Date.now() - data.created_at) / 86400000;
+        if (age > 1) {
+          keyBox.placeholder = "Key expired. Refresh later.";
           return;
         }
-
-        const encrypted = atob(encryptedBase64);
-        let decrypted = "";
-        for (let i = 0; i < encrypted.length; i++) {
-          decrypted += String.fromCharCode(
-            encrypted.charCodeAt(i) ^ passphrase.charCodeAt(i % passphrase.length)
-          );
-        }
-
-        keyInput.value = decrypted;
-        copyBtn.disabled = false;
+        // Decode Base64 → get raw key
+        const decoded = atob(data.encrypted);
+        keyBox.value = decoded;
+        btn.disabled = false;
       })
-      .catch(err => {
-        console.error(err);
-        keyInput.placeholder = "Error loading key.";
-        copyBtn.disabled = true;
+      .catch(e => {
+        console.error(e);
+        keyBox.placeholder = "Error loading key.";
       });
   </script>
 </body>
